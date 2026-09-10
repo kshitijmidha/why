@@ -131,7 +131,7 @@ a:hover {
 }
 
 .command-form {
-  margin-top: 2.5rem;
+  margin-top: 1.75rem;
 }
 
 .command-row {
@@ -243,9 +243,12 @@ a:hover {
 }
 
 .host-note {
-  margin: 1.25rem 0 0;
+  margin: 1.75rem 0 0;
+  padding: 0.75rem 0;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
   font-family: var(--mono);
-  font-size: 12.5px;
+  font-size: 13px;
   line-height: 1.6;
   color: var(--muted);
 }

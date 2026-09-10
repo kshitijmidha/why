@@ -131,6 +131,19 @@ static site and needs no container.
      `http://localhost:5173` for local dev.
 5. `PORT` is set by Render automatically; the app reads it and falls
    back to `8080` when unset.
+6. Optional: `RATE_LIMIT_REQUESTS_PER_MINUTE` (default `10`) — per-IP
+   budget for `POST /api/explain` per rolling 60s window.
+
+### API notes
+
+- `GET /` returns a small service pointer
+  (`{"status":"ok","service":"why-backend","docs":"see /api/explain"}`).
+- All errors are JSON (`{"error":"...","message":"..."}`) — e.g.
+  `not_found` (404), `bad_request` (400), `rate_limited` (429),
+  `internal_error` (500). No Whitelabel pages.
+- Over the rate limit, `POST /api/explain` returns 429 with a
+  `Retry-After: 60` header; the client IP comes from `X-Forwarded-For`
+  (Render's proxy) with fallback to the direct peer address.
 
 ### Frontend → Vercel or Netlify (static)
 
@@ -149,8 +162,8 @@ static site and needs no container.
 
 On the free tier Render spins the backend down after inactivity, so
 the first request can take up to a minute to wake the server. The
-frontend shows a quiet note about this under the examples; subsequent
-requests are fast.
+frontend shows a quiet note about this above the command input;
+subsequent requests are fast.
 
 ### Git setup / first push
 

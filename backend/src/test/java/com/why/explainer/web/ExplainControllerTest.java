@@ -123,7 +123,8 @@ class ExplainControllerTest {
             .contentType(MediaType.APPLICATION_JSON)
             .content(body(big)))
         .andExpect(status().isBadRequest())
-        .andExpect(status().reason(containsString("500 characters")));
+        .andExpect(jsonPath("$.error").value("bad_request"))
+        .andExpect(jsonPath("$.message", containsString("500 characters")));
 
     verifyNoInteractions(parser, explanations);
   }

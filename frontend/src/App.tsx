@@ -159,7 +159,19 @@ export default function App() {
       });
       if (!res.ok) {
         const text = await res.text();
-        throw new Error(text || `request failed (${res.status} ${res.statusText}).`);
+        let detail = "";
+        try {
+          const parsed = JSON.parse(text) as { message?: unknown };
+          if (typeof parsed.message === "string") detail = parsed.message;
+        } catch {
+          /* plain-text body — fall through to raw text */
+        }
+        if (res.status === 429) {
+          throw new Error(
+            detail || "too many requests — please wait a moment and try again."
+          );
+        }
+        throw new Error(detail || text || `request failed (${res.status} ${res.statusText}).`);
       }
       const data = (await res.json()) as ExplainResponse;
       setResult(data);
@@ -206,6 +218,12 @@ export default function App() {
       <section className="intro">
         <h1>explain a shell command</h1>
 
+        <p className="host-note">
+          running on render's free tier — the first request after a few minutes idle can take
+          up to a minute while the server wakes up. clone the repo and run it locally for
+          millisecond response times.
+        </p>
+
         <form className="command-form" onSubmit={onSubmit}>
           <div className="command-row">
             <span className="prompt" aria-hidden="true">
@@ -233,12 +251,6 @@ export default function App() {
             </button>
           ))}
         </div>
-
-        <p className="host-note">
-          running on render's free tier — the first request after a few minutes idle can take
-          up to a minute while the server wakes up. clone the repo and run it locally for
-          millisecond response times.
-        </p>
       </section>
 
       {status === "loading" && (
