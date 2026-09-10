@@ -1,0 +1,150 @@
+# Rules-based knowledge base for docker.
+tool: docker
+subcommands:
+  run:
+    summary: "Create and start a new container from an image."
+    flags:
+      -p:
+        meaning: "Publish a container port to the host (e.g. -p 8080:80)."
+        risk: null
+      --publish:
+        meaning: "Long form of -p: publish a container port to the host."
+        risk: null
+      -v:
+        meaning: "Mount a host path or volume into the container."
+        risk: null
+      --volume:
+        meaning: "Long form of -v: mount a host path or volume."
+        risk: null
+      -d:
+        meaning: "Run the container in the background (detached)."
+        risk: null
+      --detach:
+        meaning: "Long form of -d: run in the background."
+        risk: null
+      --rm:
+        meaning: "Automatically remove the container when it exits."
+        risk: null
+      -it:
+        meaning: "Interactive terminal: keep STDIN open and attach a pseudo-TTY."
+        risk: null
+      -i:
+        meaning: "Keep STDIN open for interactive input."
+        risk: null
+      -t:
+        meaning: "Attach a pseudo-TTY (terminal)."
+        risk: null
+      --name:
+        meaning: "Give the container a custom name."
+        risk: null
+      -e:
+        meaning: "Set an environment variable inside the container."
+        risk: null
+    effects:
+      - subsystem: "containers"
+        change: "Creates and starts a new container from the given image."
+        target: null
+      - subsystem: "network"
+        change: "Exposes container ports on the host."
+        target: null
+        whenFlags: ["-p", "--publish"]
+      - subsystem: "filesystem"
+        change: "Mounts host paths into the container."
+        target: null
+        whenFlags: ["-v", "--volume"]
+
+  build:
+    summary: "Build an image from a Dockerfile."
+    flags:
+      --tag:
+        meaning: "Name and tag the built image (e.g. --tag myapp:1.0)."
+        risk: null
+      -t:
+        meaning: "Short for --tag."
+        risk: null
+      --file:
+        meaning: "Use a Dockerfile at a custom path."
+        risk: null
+      -f:
+        meaning: "Short for --file."
+        risk: null
+      --no-cache:
+        meaning: "Build from scratch without using cached layers."
+        risk: null
+    effects:
+      - subsystem: "images"
+        change: "Builds a new image from the Dockerfile and build context."
+        target: null
+
+  exec:
+    summary: "Run a command inside an already-running container."
+    flags:
+      -it:
+        meaning: "Interactive terminal session inside the container."
+        risk: null
+      -i:
+        meaning: "Keep STDIN open."
+        risk: null
+      -t:
+        meaning: "Attach a pseudo-TTY."
+        risk: null
+      -d:
+        meaning: "Run the command in the background (detached)."
+        risk: null
+      --workdir:
+        meaning: "Set the working directory for the command."
+        risk: null
+      -w:
+        meaning: "Short for --workdir."
+        risk: null
+      -e:
+        meaning: "Set an environment variable for the command."
+        risk: null
+    effects:
+      - subsystem: "containers"
+        change: "Executes a command inside the target container."
+        target: null
+
+  compose up:
+    summary: "Create and start the services defined in compose.yaml."
+    flags:
+      -d:
+        meaning: "Start services in the background (detached)."
+        risk: null
+      --detach:
+        meaning: "Long form of -d."
+        risk: null
+      --build:
+        meaning: "Rebuild images before starting containers."
+        risk: null
+      --force-recreate:
+        meaning: "Recreate containers even if nothing changed."
+        risk: "destructive"
+    effects:
+      - subsystem: "containers"
+        change: "Creates and starts all services defined in the compose file."
+        target: null
+      - subsystem: "network"
+        change: "Creates compose networks and exposes configured ports."
+        target: null
+
+  compose down:
+    summary: "Stop and remove compose services, networks, and optionally volumes."
+    flags:
+      --volumes:
+        meaning: "Also remove named volumes (deletes stored data)."
+        risk: "destructive"
+      -v:
+        meaning: "Short for --volumes: delete volumes too."
+        risk: "destructive"
+      --rmi:
+        meaning: "Remove images used by the compose services."
+        risk: "destructive"
+    effects:
+      - subsystem: "containers"
+        change: "Stops and removes compose containers and networks."
+        target: null
+      - subsystem: "volumes"
+        change: "Deletes named volumes and the data stored in them."
+        target: null
+        whenFlags: ["-v", "--volumes"]

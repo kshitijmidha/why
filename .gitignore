@@ -1,0 +1,28 @@
+# Secrets / local env (Vite and Spring both read dotenv-style files;
+# none of these are ever committed — deploy-time values come from
+# the hosting provider's env-var settings instead)
+.env
+.env*.local
+.env.production
+.env.development
+
+# Build outputs
+backend/target/
+cli/dist/
+frontend/dist/
+
+# Dependencies
+cli/node_modules/
+frontend/node_modules/
+
+# IDE / OS
+.idea/
+.vscode/
+*.iml
+.DS_Store
+Thumbs.db
+
+# Logs and misc local artifacts
+*.log
+npm-debug.log*
+coverage/

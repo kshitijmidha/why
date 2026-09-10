@@ -1,0 +1,8 @@
+# Keep the Docker build context small: only pom.xml + src/ are needed.
+target/
+.git/
+.gitignore
+.env
+.env*
+*.log
+README.md

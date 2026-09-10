@@ -1,0 +1,21 @@
+{
+  "name": "why-cli",
+  "version": "0.1.0",
+  "description": "CLI client for the 'why' command explainer.",
+  "type": "module",
+  "bin": {
+    "why": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node ./dist/index.js",
+    "why": "node ./dist/index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^22.7.4",
+    "typescript": "^5.6.2"
+  }
+}

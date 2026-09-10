@@ -1,0 +1,161 @@
+# Rules-based knowledge base for git.
+# Each subcommand lists its known flags (with plain meanings) and the
+# effects running it has. Flags that can lose work are marked risk: "destructive".
+# Effects are either baseline (always happen) or conditional: an effect with
+# "whenFlags" only applies when at least one of those flags was actually passed.
+tool: git
+subcommands:
+  reset:
+    summary: "Move the current branch pointer to another commit."
+    flags:
+      --soft:
+        meaning: "Move HEAD only; keep staged and unstaged changes as-is."
+        risk: null
+      --mixed:
+        meaning: "Move HEAD and reset the staging area; keep working-tree files."
+        risk: null
+      --hard:
+        meaning: "Move HEAD and discard staged AND unstaged changes."
+        risk: "destructive"
+    effects:
+      - subsystem: "git-history"
+        change: "Moves the current branch pointer to the given commit."
+        target: null
+      - subsystem: "working-tree"
+        change: "Discards staged and unstaged changes in the working tree."
+        target: null
+        whenFlags: ["--hard"]
+
+  checkout:
+    summary: "Switch branches or restore working-tree files."
+    flags:
+      -b:
+        meaning: "Create a new branch and switch to it."
+        risk: null
+      --force:
+        meaning: "Switch even if local changes would be overwritten."
+        risk: "destructive"
+      --track:
+        meaning: "Set up the new branch to track a remote branch."
+        risk: null
+    effects:
+      - subsystem: "working-tree"
+        change: "Switches files to match the target branch or commit."
+        target: null
+      - subsystem: "working-tree"
+        change: "May overwrite uncommitted local changes."
+        target: null
+        whenFlags: ["--force"]
+
+  rebase:
+    summary: "Re-apply commits on top of another base commit."
+    flags:
+      --interactive:
+        meaning: "Short flag -i: edit, squash, or reorder commits in an editor."
+        risk: null
+      -i:
+        meaning: "Short for --interactive: edit, squash, or reorder commits."
+        risk: null
+      --continue:
+        meaning: "Resume rebasing after resolving conflicts."
+        risk: null
+      --abort:
+        meaning: "Cancel the rebase and return to the original state."
+        risk: null
+      --skip:
+        meaning: "Skip the current conflicting commit and continue."
+        risk: null
+    effects:
+      - subsystem: "git-history"
+        change: "Rewrites commit hashes by re-applying commits onto a new base."
+        target: null
+
+  revert:
+    summary: "Create a new commit that undoes an earlier commit."
+    flags:
+      --no-commit:
+        meaning: "Stage the revert but do not create the commit yet."
+        risk: null
+      -n:
+        meaning: "Short for --no-commit."
+        risk: null
+      --continue:
+        meaning: "Resume reverting after resolving conflicts."
+        risk: null
+      --abort:
+        meaning: "Cancel the revert and return to the original state."
+        risk: null
+    effects:
+      - subsystem: "git-history"
+        change: "Adds a new commit that undoes the target commit (history is kept)."
+        target: null
+
+  cherry-pick:
+    summary: "Apply the changes of an existing commit onto the current branch."
+    flags:
+      --no-commit:
+        meaning: "Stage the changes without committing."
+        risk: null
+      -n:
+        meaning: "Short for --no-commit."
+        risk: null
+      --continue:
+        meaning: "Resume cherry-picking after resolving conflicts."
+        risk: null
+      --abort:
+        meaning: "Cancel the cherry-pick."
+        risk: null
+    effects:
+      - subsystem: "git-history"
+        change: "Creates a new commit with the changes of the picked commit."
+        target: null
+
+  push:
+    summary: "Send local commits to a remote repository."
+    flags:
+      --force:
+        meaning: "Overwrite the remote branch even if it discards commits."
+        risk: "destructive"
+      --force-with-lease:
+        meaning: "Force-push only if the remote is in the expected state (safer force)."
+        risk: "destructive"
+      --set-upstream:
+        meaning: "Link the local branch to a remote branch for future pull/push."
+        risk: null
+      -u:
+        meaning: "Short for --set-upstream."
+        risk: null
+      --tags:
+        meaning: "Push local tags to the remote as well."
+        risk: null
+    effects:
+      - subsystem: "remote"
+        change: "Updates the remote branch with local commits."
+        target: null
+      - subsystem: "remote"
+        change: "Overwrites remote history and may permanently discard commits on the remote."
+        target: null
+        whenFlags: ["--force", "--force-with-lease"]
+
+  stash:
+    summary: "Temporarily shelve uncommitted changes."
+    flags:
+      --include-untracked:
+        meaning: "Also stash untracked files."
+        risk: null
+      -u:
+        meaning: "Short for --include-untracked."
+        risk: null
+      --message:
+        meaning: "Save the stash with a description label."
+        risk: null
+      -m:
+        meaning: "Short for --message: label the stash."
+        risk: null
+    effects:
+      - subsystem: "working-tree"
+        change: "Removes uncommitted changes from the working tree and saves them."
+        target: null
+      - subsystem: "stash"
+        change: "Stores the shelved changes so they can be re-applied later."
+        target: null
