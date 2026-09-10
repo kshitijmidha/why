@@ -235,8 +235,9 @@ export default function App() {
         </div>
 
         <p className="host-note">
-          hosted on render's free tier — the first request after inactivity can take up to a
-          minute while the server wakes up.
+          running on render's free tier — the first request after a few minutes idle can take
+          up to a minute while the server wakes up. clone the repo and run it locally for
+          millisecond response times.
         </p>
       </section>
 
